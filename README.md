@@ -71,4 +71,3 @@ Webhook route used by this project:
 
 - `POST /api/v1/payments/webhook/stripe`
 
-
