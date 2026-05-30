@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## LearningHun LMS
 
 Monorepo for the **LearningHun** enterprise LMS platform.
@@ -71,3 +72,7 @@ Webhook route used by this project:
 
 - `POST /api/v1/payments/webhook/stripe`
 
+
+=======
+# lms-project
+>>>>>>> 91641289ea9dd35e30461b8366fa5833276fdaf7
