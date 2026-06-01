@@ -6,6 +6,7 @@ use App\Http\Controllers\API\V1\Admin\CourseController;
 use App\Http\Controllers\API\V1\Admin\CourseCurriculumController;
 use App\Http\Controllers\API\V1\Admin\DashboardController;
 use App\Http\Controllers\API\V1\Admin\PaymentController;
+use App\Http\Controllers\API\V1\Admin\ProfessorController;
 use App\Http\Controllers\API\V1\Admin\StudentController;
 use App\Http\Controllers\API\V1\Admin\SiteSettingController;
 use App\Http\Controllers\API\V1\Admin\SystemController;
@@ -28,6 +29,10 @@ Route::middleware(['auth:sanctum', 'admin.auth', 'role:super_admin,admin'])->gro
     Route::delete('courses/{course:id}', [CourseController::class, 'destroy'])->name('courses.destroy');
     Route::get('payments', [PaymentController::class, 'index']);
     Route::get('payments/export', [PaymentController::class, 'export']);
+    Route::get('professors', [ProfessorController::class, 'index']);
+    Route::post('professors', [ProfessorController::class, 'store']);
+    Route::put('professors/{user}', [ProfessorController::class, 'update']);
+    Route::delete('professors/{user}', [ProfessorController::class, 'destroy']);
     Route::get('students', [StudentController::class, 'index']);
     Route::get('categories', [CategoryController::class, 'index']);
     Route::post('categories', [CategoryController::class, 'store']);
