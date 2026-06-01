@@ -121,7 +121,7 @@ class CourseController extends Controller
             ->where('course_id', $course->id)
             ->first();
 
-        $isUnlocked = $lesson->is_preview || (bool) $enrollment;
+        $isUnlocked = $lesson->is_preview || $course->is_free || (bool) $enrollment;
 
         if (! $isUnlocked) {
             return response()->json(['message' => 'Enroll in this course to access this lesson.'], 403);
@@ -153,13 +153,13 @@ class CourseController extends Controller
             'lesson' => $lesson->load('section:id,title'),
             'is_unlocked' => true,
             'progress_percentage' => $enrollment?->progress_percentage ?? 0,
-            'curriculum' => $curriculumLessons->map(function (Lesson $item) use ($enrollment): array {
+            'curriculum' => $curriculumLessons->map(function (Lesson $item) use ($enrollment, $course): array {
                 return [
                     'id' => $item->id,
                     'title' => $item->title,
                     'duration_minutes' => $item->duration_minutes,
                     'is_preview' => $item->is_preview,
-                    'is_unlocked' => $item->is_preview || (bool) $enrollment,
+                    'is_unlocked' => $item->is_preview || $course->is_free || (bool) $enrollment,
                 ];
             })->values(),
             'completed_lesson_ids' => $completedLessonIds,
@@ -182,6 +182,20 @@ class CourseController extends Controller
             ->where('user_id', $request->user()->id)
             ->where('course_id', $course->id)
             ->first();
+
+        if (! $enrollment && $course->is_free) {
+            $enrollment = Enrollment::query()->firstOrCreate(
+                [
+                    'user_id' => $request->user()->id,
+                    'course_id' => $course->id,
+                ],
+                [
+                    'enrolled_at' => now(),
+                    'status' => 'active',
+                    'progress_percentage' => 0,
+                ]
+            );
+        }
 
         if (! $enrollment) {
             return response()->json(['message' => 'Enroll in this course before updating progress.'], 403);
