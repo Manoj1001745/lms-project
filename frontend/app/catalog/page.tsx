@@ -94,7 +94,7 @@ export default function PublicCatalogPage() {
               <CourseCard
                 key={course.id}
                 course={course}
-                detailsHref={`/catalog/${course.slug}`}
+                detailsHref={`/catalog/${course.id}`}
                 actionLabel="View Details"
               />
             ))}

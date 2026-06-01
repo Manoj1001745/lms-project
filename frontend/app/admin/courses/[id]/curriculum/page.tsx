@@ -276,10 +276,10 @@ export default function CourseCurriculumPage() {
                   onChange={(e) => setCategoryId(e.target.value)}
                   className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2"
                 >
-                  <option value="">None</option>
-                  {metaQuery.data?.categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
+                  <option value="">Unassigned</option>
+                  {metaQuery.data?.categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
                     </option>
                   ))}
                 </select>

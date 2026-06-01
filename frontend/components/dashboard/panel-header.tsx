@@ -26,6 +26,7 @@ export function PanelHeader({ title, role, userName, roleLabel }: PanelHeaderPro
           { href: "/admin/dashboard", label: "Dashboard" },
           { href: "/admin/courses", label: "Courses" },
           { href: "/admin/categories", label: "Categories" },
+          { href: "/admin/professors", label: "Professors" },
           { href: "/admin/payments", label: "Payments" },
           { href: "/admin/students", label: "Students" },
           { href: "/admin/settings", label: "Settings" },

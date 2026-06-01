@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { getApiErrorMessage } from "@/lib/api-errors";
 import { useRouter } from "next/navigation";
@@ -20,11 +20,12 @@ function slugify(value: string) {
 export default function NewCoursePage() {
   const router = useRouter();
   const token = useAuthStore((state) => state.token);
+  const [categoryId, setCategoryId] = useState("");
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [slugTouched, setSlugTouched] = useState(false);
   const [price, setPrice] = useState("0");
-  const [isFree, setIsFree] = useState(false);
+  const [pricing, setPricing] = useState<"free" | "paid">("paid");
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,6 +34,15 @@ export default function NewCoursePage() {
   useEffect(() => {
     if (!token) router.replace("/admin/login");
   }, [router, token]);
+
+  const metaQuery = useQuery({
+    queryKey: ["admin-courses-meta"],
+    enabled: Boolean(token),
+    queryFn: async () => {
+      const response = await adminApi.get<{ categories: Array<{ id: number; name: string }> }>("/courses/meta");
+      return response.data;
+    },
+  });
 
   useEffect(() => {
     if (!slugTouched) setSlug(suggestedSlug);
@@ -43,8 +53,9 @@ export default function NewCoursePage() {
       const formData = new FormData();
       formData.append("title", title.trim());
       formData.append("slug", normalizedSlug);
-      formData.append("price", isFree ? "0" : String(Number(price) || 0));
-      formData.append("is_free", isFree ? "1" : "0");
+      formData.append("price", pricing === "free" ? "0" : String(Number(price) || 0));
+      formData.append("is_free", pricing === "free" ? "1" : "0");
+      if (categoryId) formData.append("category_id", categoryId);
       if (thumbnail) formData.append("thumbnail", thumbnail);
 
       const response = await adminApi.post<{ course: { id: number } }>("/courses", formData);
@@ -111,23 +122,57 @@ export default function NewCoursePage() {
           </label>
 
           <label className="block text-sm text-slate-200">
-            Price (NPR)
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              disabled={isFree}
-              required={!isFree}
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 disabled:opacity-50"
-            />
+            Category
+            <select
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
+              className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2"
+            >
+              <option value="">Select category</option>
+              {metaQuery.data?.categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
           </label>
 
-          <label className="flex items-center gap-2 text-sm text-slate-200">
-            <input type="checkbox" checked={isFree} onChange={(e) => setIsFree(e.target.checked)} />
-            Free course
-          </label>
+          <div className="rounded-lg border border-slate-800 bg-slate-950 p-4">
+            <p className="text-sm font-semibold text-slate-200">Pricing</p>
+            <div className="mt-3 flex flex-wrap gap-3 text-sm text-slate-200">
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="pricing"
+                  checked={pricing === "free"}
+                  onChange={() => setPricing("free")}
+                />
+                Free (visible to everyone)
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="pricing"
+                  checked={pricing === "paid"}
+                  onChange={() => setPricing("paid")}
+                />
+                Paid
+              </label>
+            </div>
+            <label className="mt-4 block text-sm text-slate-200">
+              Price (NPR)
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                disabled={pricing === "free"}
+                required={pricing === "paid"}
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 disabled:opacity-50"
+              />
+            </label>
+          </div>
 
           <div>
             <p className="mb-2 text-sm text-slate-200">Thumbnail</p>

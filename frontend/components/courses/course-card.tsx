@@ -20,6 +20,7 @@ type CourseCardProps = {
   showProgress?: boolean;
   dateLabel?: string;
   compact?: boolean;
+  className?: string;
 };
 
 function formatAmount(amount: number) {
@@ -35,6 +36,7 @@ export function CourseCard({
   showProgress = false,
   dateLabel,
   compact = false,
+  className = "",
 }: CourseCardProps) {
   const addedLabel =
     dateLabel ??
@@ -45,7 +47,7 @@ export function CourseCard({
         : null);
 
   return (
-    <article className="lms-card flex h-full flex-col overflow-hidden p-0">
+    <article className={`lms-card flex h-full flex-col overflow-hidden p-0 ${className}`}>
       <div className={`relative w-full overflow-hidden bg-slate-200 dark:bg-slate-800 ${compact ? "aspect-[16/10]" : "aspect-video"}`}>
         <div className="absolute inset-0">
           <CourseThumbnail
