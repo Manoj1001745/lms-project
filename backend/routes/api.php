@@ -4,11 +4,13 @@ use App\Http\Controllers\API\V1\Public\CertificateVerificationController;
 use App\Http\Controllers\API\V1\Public\CatalogController;
 use App\Http\Controllers\API\V1\Public\ContactController;
 use App\Http\Controllers\API\V1\Public\PaymentWebhookController;
+use App\Http\Controllers\API\V1\Public\ProfessorController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
     Route::get('courses/catalog', [CatalogController::class, 'index']);
     Route::get('courses/catalog/{course}', [CatalogController::class, 'show']);
+    Route::get('professors', [ProfessorController::class, 'index']);
     Route::post('contact', [ContactController::class, 'store']);
     Route::get('certificates/verify/{certificateNo}', [CertificateVerificationController::class, 'show']);
     Route::post('payments/webhook/{gateway}', [PaymentWebhookController::class, 'handle']);
