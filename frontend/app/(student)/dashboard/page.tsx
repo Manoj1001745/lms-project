@@ -80,6 +80,17 @@ export default function StudentDashboardPage() {
   const continueCourses = [...myCoursesQuery.data.courses]
     .sort((a, b) => b.progress_percentage - a.progress_percentage)
     .slice(0, 3);
+  const progressHighlights = [...myCoursesQuery.data.courses]
+    .sort((a, b) => b.progress_percentage - a.progress_percentage)
+    .slice(0, 6);
+  const averageProgress = Math.round(
+    myCoursesQuery.data.courses.reduce((sum, item) => sum + item.progress_percentage, 0) /
+      Math.max(1, myCoursesQuery.data.courses.length),
+  );
+  const activeCourses = myCoursesQuery.data.courses.filter(
+    (item) => item.progress_percentage > 0 && item.progress_percentage < 100,
+  ).length;
+  const paidCourses = myCoursesQuery.data.courses.filter((item) => Number(item.course.price ?? 0) > 0);
 
   return (
     <PageShell>
@@ -92,6 +103,100 @@ export default function StudentDashboardPage() {
         <StatCard label="Enrolled Courses" value={dashboardQuery.data.learning.enrolled_courses} />
         <StatCard label="Completed Courses" value={dashboardQuery.data.learning.completed_courses} />
         <StatCard label="Completion Rate" value={`${dashboardQuery.data.learning.completion_rate}%`} />
+      </section>
+
+      <section className="mt-8 grid gap-5 lg:grid-cols-[2fr_1fr]">
+        <div className="lms-card p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Progress tracker</h2>
+              <p className="text-sm text-slate-600 dark:text-slate-300">
+                A quick visual snapshot of your top courses.
+              </p>
+            </div>
+            <span className="rounded-full bg-brand-blue/10 px-3 py-1 text-xs font-semibold text-brand-blue">
+              Avg {averageProgress}%
+            </span>
+          </div>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-900/60">
+              <div className="flex h-32 items-end gap-2">
+                {progressHighlights.length === 0 && (
+                  <div className="text-sm text-slate-500">No progress data yet.</div>
+                )}
+                {progressHighlights.map((item) => (
+                  <div key={item.id} className="flex h-full flex-1 flex-col items-center gap-2">
+                    <div className="flex h-full w-full items-end">
+                      <div
+                        className="w-full rounded-md bg-brand-green/80 transition-all"
+                        style={{ height: `${Math.max(8, item.progress_percentage)}%` }}
+                      />
+                    </div>
+                    <span className="max-w-[90px] truncate text-[11px] text-slate-500" title={item.course.title}>
+                      {item.course.title}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900/60">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-slate-500">Active tracks</p>
+                <p className="mt-1 text-2xl font-semibold text-slate-900 dark:text-white">{activeCourses}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-wide text-slate-500">Best completion</p>
+                <p className="mt-1 text-2xl font-semibold text-slate-900 dark:text-white">
+                  {progressHighlights[0]?.progress_percentage ?? 0}%
+                </p>
+                <p className="text-xs text-slate-500">
+                  {progressHighlights[0]?.course.title ?? "Start a course to see progress."}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-wide text-slate-500">Next milestone</p>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                  Keep your streak alive with one lesson today.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="lms-card p-5">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Paid courses</h2>
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+            Access all paid enrollments after payment is confirmed.
+          </p>
+          <div className="mt-4 space-y-3">
+            {paidCourses.length === 0 && (
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300">
+                No paid enrollments yet. Explore premium courses to unlock them here.
+              </div>
+            )}
+            {paidCourses.slice(0, 3).map((item) => (
+              <Link
+                key={item.id}
+                href={`/courses/${item.course.slug}`}
+                className="block rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <p className="font-semibold text-slate-900 dark:text-white">{item.course.title}</p>
+                    <p className="text-xs text-slate-500">
+                      {item.progress_percentage}% completed
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-brand-yellow/20 px-2 py-1 text-xs font-semibold text-slate-800">
+                    Paid
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
       </section>
 
       <section className="lms-card mt-8 p-5">
