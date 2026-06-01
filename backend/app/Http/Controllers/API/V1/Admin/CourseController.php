@@ -62,6 +62,7 @@ class CourseController extends Controller
         }
 
         $payload = $request->validate([
+            'category_id' => ['nullable', 'exists:categories,id'],
             'title' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', Rule::unique('courses', 'slug')],
             'price' => ['required', 'numeric', 'min:0'],
@@ -84,9 +85,10 @@ class CourseController extends Controller
         }
 
         $course = Course::query()->create([
+            'category_id' => $payload['category_id'] ?? null,
             'title' => $payload['title'],
             'slug' => $slug,
-            'price' => $payload['price'],
+            'price' => $request->boolean('is_free') ? 0 : $payload['price'],
             'is_free' => $request->boolean('is_free'),
             'is_published' => false,
             'duration_minutes' => 0,
