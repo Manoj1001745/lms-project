@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { CourseCard } from "@/components/courses/course-card";
-import { PageHeading, PageMessage, PageShell } from "@/components/ui/page-primitives";
+import { PageHeading, PageShell } from "@/components/ui/page-primitives";
 import { useCourseListStore } from "@/stores/course-list.store";
 
 export default function MyListPage() {
