@@ -66,6 +66,8 @@ class CatalogController extends Controller
                     'title' => $lesson->title,
                     'duration_minutes' => $lesson->duration_minutes,
                     'is_preview' => (bool) $lesson->is_preview,
+                    'video_url' => $course->is_free ? $lesson->video_url : null,
+                    'content' => $course->is_free ? $lesson->content : null,
                 ])->values(),
                 'total_lessons' => $course->lessons->count(),
                 'level' => Str::of((string) $course->category?->name)->contains('advanced', true) ? 'Advanced' : 'Beginner-Friendly',
