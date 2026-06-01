@@ -222,7 +222,7 @@ export default function CourseDetailsPage() {
                   <span className="text-xs text-slate-500">
                     {lesson.duration_minutes} mins {lesson.is_preview ? "• Preview" : ""}
                   </span>
-                  {data.is_enrolled || lesson.is_preview ? (
+                  {data.is_enrolled || course.is_free || lesson.is_preview ? (
                     <Link
                       href={`/learn/${course.slug}/${lesson.id}`}
                       className="rounded-md bg-slate-900 px-3 py-1 text-xs font-semibold text-white"
